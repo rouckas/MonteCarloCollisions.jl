@@ -1,4 +1,5 @@
---
+module MonteCarloCollisions
+
 using StaticArrays
 using PhysicalConstants.CODATA2018
 using Unitful
