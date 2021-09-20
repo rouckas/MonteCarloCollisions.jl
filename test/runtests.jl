@@ -35,6 +35,26 @@ end
 
 end
 
+@testset "maxwell_tests" begin
+    nsampl = 1000000
+    
+    oxygen_test = oxygen_test = Neutrals("Oxygen", 300., 16*amu, 2e19)
+    
+    std_sample = [norm(random_maxwell_v(oxygen_test.vthermal)) for x in 1:nsampl]
+    
+    test_sample = [norm(random_maxwell_v(oxygen_test.vthermal)) for x in 1:nsampl]
+    
+    mean_test = [random_maxwell_v(oxygen_test.vthermal) for x in 1:nsampl]
+    
+    @test sqrt(8/pi)*oxygen_test.vthermal - std(std_sample)/100 *5 < mean(test_sample)# < sqrt(8/pi)*oxygen_test.vthermal + std(std_sample)/100
+    
+    @test mean(test_sample) < sqrt(8/pi)*oxygen_test.vthermal + std(std_sample)/100 *5
+
+    @test mean(mean_test) < [0,0,0]
+    
+    
+end 
+
     
 @testset "interaction_tests" begin
 
