@@ -19,23 +19,24 @@ end
     
         sodium_test_particle = MonteCarloCollisions.Particles("sodium_test_particle", 23*amu, q_e, 2)
     
-        MonteCarloCollisions.init_thermal(sodium_test_particle, 10)
+        MonteCarloCollisions.init_thermal(sodium_test_particle, 9)
     
         MonteCarloCollisions.init_thermal(fluor_test_particle, 10)
     
-        MonteCarloCollisions.init_thermal(oxygen_test_particle, 10)
+        MonteCarloCollisions.init_thermal(oxygen_test_particle, 11)
     
         scatter_v = MonteCarloCollisions.scatter(sodium_test_particle.list[1].v, fluor_test_particle.list[1].v, sodium_test_particle.m, fluor_test_particle.m, norm(sodium_test_particle.list[1].v - fluor_test_particle.list[1].v), 0)
             
         @test fluor_test_particle.list[1].v != scatter_v
 
-        @test energy(sodium_test_particle) > energy(fluor_test_particle) > energy(oxygen_test_particle)
+        @test MonteCarloCollisions.energy(sodium_test_particle) > MonteCarloCollisions.energy(fluor_test_particle) > MonteCarloCollisions.energy(oxygen_test_particle)
 
         @test norm(reference_particle.list[1].v) != norm(scatter_v)
 
 end
 
 @testset "maxwell_tests" begin
+<<<<<<< HEAD
     nsampl = 1000000
     
     oxygen_test = oxygen_test = Neutrals("Oxygen", 300., 16*amu, 2e19)
@@ -60,7 +61,7 @@ end
 
     oxygen_test = MonteCarloCollisions.Neutrals("Oxygen", 300., 16*amu, 2e19);
     
-    oxygen_list = MonteCarloCollisions.load_interactions_lxcat("test2.txt", electrons, oxygen_test)
+    oxygen_list = MonteCarloCollisions.load_interactions_lxcat("test_input.txt", electrons, oxygen_test)
 
     test_interaction = MonteCarloCollisions.make_interactions(electrons, oxygen_list)
 
