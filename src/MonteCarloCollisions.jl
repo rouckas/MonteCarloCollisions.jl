@@ -303,7 +303,7 @@ function scatter(v::SVector{3, Float64}, m, inters::Interactions)
     v
 end
 
-function advance!(particles::Particles, interactions::Interactions, E, tmax)
+function advance!(particles::Particles, interactions::Interactions, E, B=nothing, tmax)
     q = particles.q
     m = particles.m
     accel = E.*q/m
@@ -322,7 +322,12 @@ function advance!(particles::Particles, interactions::Interactions, E, tmax)
                 break
             end
 
-            v, t = advance(v, t, accel, tau)
+            if isnothing(B)
+                v, t = advance(v, t, accel, tau)
+            else
+                v, t = advance(v, t, E, B, tau)
+            end
+            
             v = scatter(v, m , interactions,)
 
         end
@@ -333,6 +338,19 @@ end
 
 @inline function advance(v, t, a, tau)
     v+a*tau, t+tau
+end
+
+@inline function advance(v, t, E, B, tau)
+    v_minus = v + E.* (q/m * tau/2)
+    
+    T = B.*(q/m * tau/2)
+    S = 2 .* T ./ (1 .+ T.^2)
+
+    v_prime = v_minus .+ cross(v_minus, T)
+    
+    v_plus = v_minus .+ cross(v_prime, S)
+    
+    v_plus .+ E.*q/m * tau/2, t+tau
 end
 
 end
