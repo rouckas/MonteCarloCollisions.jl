@@ -303,7 +303,7 @@ function scatter(v::SVector{3, Float64}, m, inters::Interactions)
     v
 end
 
-function advance!(particles::Particles, interactions::Interactions, E, B=nothing, tmax)
+function advance!(particles::Particles, interactions::Interactions, E, tmax, B=nothing)
     q = particles.q
     m = particles.m
     accel = E.*q/m
