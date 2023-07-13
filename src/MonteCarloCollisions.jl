@@ -6,7 +6,7 @@ using Unitful
 using Interpolations
 using Optim
 using Random: rand, randn, randexp
-using LinearAlgebra: norm
+using LinearAlgebra: norm, cross
 
 
 
