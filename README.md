@@ -12,7 +12,7 @@
 
 ### Basic usage
 - First download the relevant tabulated cross sections from [LXCAT](https://nl.lxcat.net/data/set_type.php) database
-- Let's simulate electrons in helium/argon mixture using the cross sections from the Phelps' database at LXCAT - the collision cross sections will be stored in `data/CS_e_Ar_Phelps.txt` and `data/CS_e_Ar_Phelps.txt`
+- Let's simulate electrons in helium/argon mixture using the cross sections from the Phelps' database at LXCAT - the collision cross sections will be stored in `data/CS_e_He_Phelps.txt` and `data/CS_e_Ar_Phelps.txt`
 - Then in Julia
 ```julia
 # import the module
@@ -55,7 +55,7 @@ for i in 1:size(tax,1)
 end
 #
 # and we can check the convergence rate by looking at the time evolution of the mean energy
-mport PyPlot
+import PyPlot
 PyPlot.plot(tax*1e9, Emeans/q_e)
 PyPlot.xlabel("time (ns)")
 PyPlot.ylabel("mean electron energy (eV)")

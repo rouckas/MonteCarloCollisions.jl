@@ -6,7 +6,7 @@ using Unitful
 using Interpolations
 using Optim
 using Random: rand, randn, randexp
-using LinearAlgebra: norm
+using LinearAlgebra: norm, dot, cross
 
 
 
@@ -303,10 +303,12 @@ function scatter(v::SVector{3, Float64}, m, inters::Interactions)
     v
 end
 
-function advance!(particles::Particles, interactions::Interactions, E, tmax)
+function advance!(particles::Particles, interactions::Interactions, E, tmax, B=[0.,0.,0.])
     q = particles.q
     m = particles.m
-    accel = E.*q/m
+    Eqm = SVector{3,Float64}(E.*q/m)
+    Bqm = SVector{3,Float64}(B.*q/m)
+
     tau_mean = 1/interactions.rate
 
     Threads.@threads for particle in particles.list
@@ -316,16 +318,24 @@ function advance!(particles::Particles, interactions::Interactions, E, tmax)
 
         while true
             tau = randexp()*tau_mean
+            
             if t+tau > tmax
-                tau = max(tmax - t, 0.)
-                v, t = advance(v, t, accel, tau)
-                break
+                tau = max(tmax - t, 0.) 
             end
 
-            v, t = advance(v, t, accel, tau)
+            if iszero(B)
+                v, t = advance(v, t, Eqm, tau)
+            else
+                v, t = advance(v, t, Eqm, Bqm, tau)
+            end
+            
+            if t+tau >= tmax
+                break
+            end
+            
             v = scatter(v, m , interactions,)
-
         end
+        
         particle.v = v
         particle.t = t
     end
@@ -333,6 +343,17 @@ end
 
 @inline function advance(v, t, a, tau)
     v+a*tau, t+tau
+end
+
+@inline function advance(v, t, Eqm, Bqm, tau)
+    v_minus = v + Eqm * tau/2
+    
+    T = Bqm * tau/2
+    S = T * 2/ (1. + dot(T, T))
+    
+    v_prime = v_minus + cross(v_minus, T)
+    
+    v_minus + cross(v_prime, S) + Eqm * tau/2, t+tau
 end
 
 end
