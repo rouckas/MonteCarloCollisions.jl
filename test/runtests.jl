@@ -12,7 +12,7 @@ using Test
     @test mean(samples) < std(samples)/sqrt(nsampl)*5
 
     # test Boris mover
-    electrons = Particles("electron", m_e, q_e, 10);
+    electrons = ParticleEnsemble("electron", m_e, q_e, 10);
     nointeraction = make_interactions(electrons, Interactions[])
     init_thermal(electrons, 10000)
     B = SVector(0., 0., 0.01)
@@ -28,37 +28,37 @@ using Test
 
 
     # test that velocity returns to original after cyclotron period
-    v0 = map(x->x.v, electrons.list)
+    v0 = map(x->x.v, electrons.coords)
     advance!(electrons, nointeraction, E, B, dt*steps_per_Tc, Bstep)
-    v1 = map(x->x.v, electrons.list)
+    v1 = map(x->x.v, electrons.coords)
     @test all(v0 .≈ v1)
 
     # velocity oposite after half period
     init_time(electrons)
-    v0 = map(x->x.v[1:2], electrons.list)
+    v0 = map(x->x.v[1:2], electrons.coords)
     advance!(electrons, nointeraction, E, B, dt*steps_per_Tc/2, Bstep)
-    v1 = map(x->x.v[1:2], electrons.list)
+    v1 = map(x->x.v[1:2], electrons.coords)
     @test all(v0 .≈ .-v1)
 
     # velocity perpendicular after quarter period
     init_time(electrons)
-    v0 = map(x->x.v[1:2], electrons.list)
+    v0 = map(x->x.v[1:2], electrons.coords)
     advance!(electrons, nointeraction, E, B, dt*steps_per_Tc/4, Bstep)
-    v1 = map(x->x.v[1:2], electrons.list)
+    v1 = map(x->x.v[1:2], electrons.coords)
     @test all(dot(v0 .+ v1, v1) .≈ dot(v1, v1))
 
     # energy conservation
     init_time(electrons)
-    v0 = map(x->x.v[1:2], electrons.list)
+    v0 = map(x->x.v[1:2], electrons.coords)
     advance!(electrons, nointeraction, E, B, dt*steps_per_Tc*123.5678, Bstep)
-    v1 = map(x->x.v[1:2], electrons.list)
+    v1 = map(x->x.v[1:2], electrons.coords)
     @test all(dot(v0, v0) .≈ dot(v1, v1))
 
 
     # test data loading
-    argon = Neutrals("argon", 300., 40*amu, 1e22)
-    helium = Neutrals("helium", 300., 4*amu, 1e23)
-    electrons = Particles("electron", m_e, q_e, 1000)
+    argon = NeutralEnsemble("argon", 300., 40*amu, 1e22)
+    helium = NeutralEnsemble("helium", 300., 4*amu, 1e23)
+    electrons = ParticleEnsemble("electron", m_e, q_e, 1000)
     helium_interaction_list = load_interactions_lxcat("../data/CS_e_He.txt", electrons, helium)
     @test length(helium_interaction_list) == 3
     @test length(helium_interaction_list[1].sigmav) == 8

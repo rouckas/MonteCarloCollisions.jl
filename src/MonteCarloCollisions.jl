@@ -10,7 +10,7 @@ using LinearAlgebra: norm, dot, cross
 
 
 
-export Neutrals, Particles, Interaction, Interactions, add_interaction!
+export NeutralEnsemble, ParticleEnsemble, Interaction, Interactions, add_interaction!
 export load_interaction_lxcat, load_interactions_lxcat, svmax_find!, init_rates!, make_interactions
 export init_time, init_monoenergetic, init_thermal
 export advance, advance!, energy
@@ -22,79 +22,15 @@ const q_e = ustrip(u"C", CODATA2018.e)
 const k_B = ustrip(u"J/K", CODATA2018.k_B)
 
 include("RandomSampling.jl")
-
-abstract type Species end
-
-struct Neutrals <: Species
-    name::String
-    T::Float64
-    m::Float64
-    n::Float64
-    vthermal::Float64
-end
-
-Neutrals(name, T, m, n) = Neutrals(name, T, m, n, sqrt(k_B*T/m))
-
-@inline function random_sample(s::Neutrals)
-    random_maxwell_v(s.vthermal)
-end
-
-mutable struct Particle
-    v::SVector{3, Float64}
-    t::Float64
-    tau::Float64
-end
-
-struct Particles <: Species
-    name::String
-    m::Float64
-    q::Float64
-    n::Int64
-    list::Array{Particle, 1}
-end
-
-function Particles(name, m, q, n)
-    Particles(
-        name, m, q, n,
-        [Particle(SVector(0.,0.,0.), 0., 0.) for i in 1:n]
-    )
-end
-
-function init_monoenergetic(particles::Particles, Eev)
-    vtot = sqrt(2*Eev*particles.q/particles.m)
-    for p in particles.list
-        p.v = random_direction(vtot)
-    end
-end
-
-function init_thermal(particles::Particles, T)
-    vthermal = sqrt(k_B*T/particles.m)
-    for p in particles.list
-        p.v = random_maxwell_v(vthermal)
-    end
-end
-
-function init_time(particles::Particles)
-    for p in particles.list
-        p.t = 0.
-    end
-end
-
-function energy(species::Species, particle::Particle)
-    0.5*species.m*sum(particle.v.^2)
-end
-
-function energy(particles::Particles)
-    map(p -> energy(particles, p), particles.list)
-end
+include("Particles.jl")
 
 InterpolationType = typeof(interpolate(([0.,1.],), [0.,1.], Gridded(Linear())))
 
 struct Interaction
     name::String
     DE::Float64
-    species1::Particles
-    species2::Neutrals
+    species1::ParticleEnsemble
+    species2::NeutralEnsemble
     mu::Float64
     sigmav::InterpolationType
     #Interpolations.GriddedInterpolation{Float64, 1, Float64, Gridded{Linear{Interpolations.Throw{Interpolations.OnGrid}}}, Tuple{Vector{Float64}}}
@@ -190,19 +126,22 @@ function load_interactions_lxcat(filename, species1, species2)
     result
 end
 
-mutable struct Interactions
+mutable struct Interactions{P <: AbstractEnsemble}
     # structure representing all interactions of Species spec1 with
     # partners from list spec2_list
-    spec1::Particles
+    spec1::P
     list::Vector{Vector{Interaction}} # list[i] contains list of interactions with spec2_list[1]
     spec2_names::Vector{String}
-    spec2_list::Vector{Neutrals} # list of interacting species
+    spec2_list::Vector{NeutralEnsemble} # list of interacting species
     svmax_list::Vector{Float64}  # maximum of total sigma*v_rel for each spec2
     prob_list::Vector{Float64}   # interaction rates of spec2 divided by total rate
     rate::Float64 # (s-1) total interaction rate of spec1
 end
 
-Interactions(species) = Interactions(species, [], [], [], [], [], 0.)
+Interactions(species::P) where P <: AbstractEnsemble = 
+    Interactions(
+        species,
+        Vector{Interaction}[], String[], NeutralEnsemble[], Float64[], Float64[], 0.)
 
 function add_interaction!(inters, interaction)
     i = findfirst(isequal(interaction.species2.name), inters.spec2_names)
@@ -290,7 +229,7 @@ function scatter(v::SVector{3, Float64}, m, inters::Interactions)
     v
 end
 
-function advance!(particles::Particles, interactions::Interactions, E, B, tmax::Real, Bstep::Real = 0.1)
+function advance!(particles::ParticleEnsemble, interactions::Interactions, E, B, tmax::Real, Bstep::Real = 0.1)
     q = particles.q
     m = particles.m
     Eqm = SVector{3,Float64}(E.*q/m)
@@ -312,7 +251,7 @@ function advance!(particles::Particles, interactions::Interactions, E, B, tmax::
     tau_mean = 1/interactions.rate
 
     #Threads.@threads
-    for particle in particles.list
+    for particle in particles.coords
         t = particle.t
         v = particle.v
         tau = particle.tau
@@ -349,14 +288,14 @@ function advance!(particles::Particles, interactions::Interactions, E, B, tmax::
     end
 end
 
-function advance!(particles::Particles, interactions::Interactions, E, tmax::Real)
+function advance!(particles::ParticleEnsemble, interactions::Interactions, E, tmax::Real)
     q = particles.q
     m = particles.m
     Eqm = SVector{3,Float64}(E.*q/m)
 
     tau_mean = 1/interactions.rate
 
-    Threads.@threads for particle in particles.list
+    Threads.@threads for particle in particles.coords
         t = particle.t
         v = particle.v
         tau = particle.tau
