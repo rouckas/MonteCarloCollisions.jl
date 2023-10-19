@@ -1,0 +1,63 @@
+This is just a sample file to test loading the data from the LXCat, www.lxcat.net database. The format mimics
+the e- + Ar scattering data from the Phelps database.
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+************************************************************************************************************************
+
+COMMENT:
+
+********************************************************** He **********************************************************
+
+EFFECTIVE
+He
+ 1.360000e-4
+SPECIES: e / He
+PROCESS: E + He -> E + He, Effective
+PARAM.:  m/M = 0.000136, complete set
+COMMENT: momentum TRANSFER - FROM CROMPTON ET AL AT LOW ENERGY, HAYASHI AT HIGH ENERGIES(IN SIGLO).
+UPDATED: 2011-06-06 11:19:56
+COLUMNS: Energy (eV) | Cross section (m2)
+-----------------------------
+ 0.000000e+0	4.960000e-20
+ 1.000000e-3	4.980000e-20
+ 1.000000e-2	5.210000e-20
+ 1.000000e-1	5.860000e-20
+ 1.000000e+0	6.850000e-20
+ 1.000000e+1	4.720000e-20
+ 1.000000e+2	7.500000e-21
+ 1.000000e+3	1.700000e-21
+-----------------------------
+
+EXCITATION
+He -> He*(19.8eV)
+ 1.980000e+1
+SPECIES: e / He
+PROCESS: E + He -> E + He*(19.8eV), Excitation
+PARAM.:  E = 19.8 eV, complete set
+COMMENT: FROM 1960'S ANALYSIS OF MEIR-LEIBNITZ AND OTHERS BY PHELPS.
+UPDATED: 2010-06-24 08:11:57
+COLUMNS: Energy (eV) | Cross section (m2)
+-----------------------------
+ 1.980000e+1	0.000000e+0
+ 2.002000e+1	4.100000e-22
+ 1.000000e+2	1.150000e-21
+ 1.000000e+3	2.500000e-22
+-----------------------------
+
+IONIZATION
+He -> He^+
+ 2.460000e+1
+SPECIES: e / He
+PROCESS: E + He -> E + E + He+, Ionization
+PARAM.:  E = 24.6 eV, complete set
+COMMENT: RAPP AND ENGLANDER-GOLDEN, 1965.
+UPDATED: 2010-03-13 05:04:39
+COLUMNS: Energy (eV) | Cross section (m2)
+-----------------------------
+ 2.460000e+1	0.000000e+0
+ 3.000000e+1	7.100000e-22
+ 1.000000e+2	3.510000e-21
+ 1.000000e+3	1.400000e-21
+-----------------------------
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

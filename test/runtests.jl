@@ -53,4 +53,13 @@ using Test
     advance!(electrons, nointeraction, E, B, dt*steps_per_Tc*123.5678, Bstep)
     v1 = map(x->x.v[1:2], electrons.list)
     @test all(dot(v0, v0) .≈ dot(v1, v1))
+
+
+    # test data loading
+    argon = Neutrals("argon", 300., 40*amu, 1e22)
+    helium = Neutrals("helium", 300., 4*amu, 1e23)
+    electrons = Particles("electron", m_e, q_e, 1000)
+    helium_interaction_list = load_interactions_lxcat("../data/CS_e_He.txt", electrons, helium)
+    @test length(helium_interaction_list) == 3
+    @test length(helium_interaction_list[1].sigmav) == 8
 end

@@ -1,0 +1,49 @@
+This is just a sample file to test loading the data from the LXCat, www.lxcat.net database. The format mimics
+the Ar+ + Ar scattering data from the Phelps database.LXCat, www.lxcat.net
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+************************************************************************************************************************
+
+
+********************************************************** Ar **********************************************************
+
+SPECIES: Ar^+ / Ar
+PROCESS: Ar+ + Ar -> , Backscat
+PARAM.:  Mi = 39.948, Mi/M = 1, complete set
+COMMENT: Ar+ in Ar: Phelps, J. Appl. Phys. 76, 747 (1994).
+COMMENT: 0.5*(1.15E-18*(1.+0.015/2./col(A))^0.6/(2.*col(A))^0.1-2E-19/(2.*col(A))^0.5/(1.+2.*col(A))-3E-19*2.*col(A)/(1.+2.*col(A)/3.)^2.3).
+UPDATED: 2011-10-30 07:03:24
+COLUMNS: Energy (eV) | Cross section (m2)
+-----------------------------
+ 0.000000e+0	1.104590e-17
+ 1.000000e-4	1.104590e-17
+ 1.000000e-3	1.633690e-18
+ 1.000000e-2	4.933670e-19
+ 1.000000e-1	4.931580e-19
+ 1.000000e+0	4.226790e-19
+ 1.000000e+1	3.975760e-19
+ 1.000000e+2	3.366340e-19
+ 1.000000e+3	2.687880e-19
+ 1.000000e+4	2.135770e-19
+-----------------------------
+
+SPECIES: Ar^+ / Ar
+PROCESS: Ar+ + Ar -> , Isotropic
+PARAM.:  Mi = 39.948, Mi/M = 1, complete set
+COMMENT: Ar+ in Ar: Phelps, J. Appl. Phys. 76, 747 (1994).
+COMMENT: 2E-19/(2.*col(A))^0.5/(1.+2.*col(A))+3E-19*2.*col(A)/(1.+2.*col(A)/3.)^2.3.
+UPDATED: 2016-03-25 18:22:30
+COLUMNS: Energy (eV) | Cross section (m2)
+-----------------------------
+ 0.000000e+0	1.413940e-17
+ 1.000000e-4	1.413940e-17
+ 1.000000e-3	4.463810e-18
+ 1.000000e-2	1.392390e-18
+ 1.000000e-1	4.244010e-19
+ 1.000000e+0	2.324510e-19
+ 1.000000e+1	5.753550e-20
+ 1.000000e+2	3.771100e-21
+ 1.000000e+3	1.935120e-22
+ 1.000000e+4	9.687080e-24
+-----------------------------
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
