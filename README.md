@@ -17,16 +17,16 @@
 ```julia
 # import the module
 using MonteCarloCollisions
-using Statistics
+using Statistics, StaticArrays, Plots
 #
 # set up the background interacting species.
-# Neutrals(name, temperature (K), mass (kg), number density (m^-3)
-helium = Neutrals("helium", 300., 4*amu, 1e23);
-argon = Neutrals("argon", 300., 40*amu, 1e22);
+# NeutralEnsemble(name, temperature (K), mass (kg), number density (m^-3)
+helium = NeutralEnsemble("helium", 300., 4*amu, 1e23);
+argon = NeutralEnsemble("argon", 300., 40*amu, 1e22);
 #
 # and the primary simulated species
-# Particles(name, mass (kg), charge (C), number of particles)
-electrons = Particles("electron", m_e, q_e, 10000);
+# ParticleEnsemble(name, mass (kg), charge (C), number of particles)
+electrons = ParticleEnsemble("electron", m_e, q_e, 10000);
 #
 # Create `Interactions` object from the cross section data
 helium_interaction_list = load_interactions_lxcat("data/CS_e_He_Phelps.txt", electrons, helium);
@@ -38,7 +38,7 @@ init_thermal(electrons, 10000)
 # reset their simulation time
 init_time(electrons)
 # set external electrostatic field at 1000 V/m in x direction
-E = [1000., 0., 0.]
+E = SVector(1000., 0., 0.)
 #
 # Currently MonteCarloCollisions provides advance! method to advance the particles in time by a fixed time
 # To simulate the time evolution and the equilibrium distribution, we need to write a loop
@@ -55,16 +55,13 @@ for i in 1:size(tax,1)
 end
 #
 # and we can check the convergence rate by looking at the time evolution of the mean energy
-import PyPlot
-PyPlot.plot(tax*1e9, Emeans/q_e)
-PyPlot.xlabel("time (ns)")
-PyPlot.ylabel("mean electron energy (eV)")
-PyPlot.grid()
+plot(tax ./ 1e-6, Emeans ./ q_e, label="", xlabel="t (μs)", ylabel="⟨E⟩ (eV)")
 #
 # or we can plot the actual equilibrium distribution of electrons
-PyPlot.hist(energies/q_e, bins=100, density=true)
-PyPlot.xlabel("electron energy (eV)")
-PyPlot.ylabel("probability")
-PyPlot.grid()
-PyPlot.yscale("log")
+stephist(energies ./ q_e, normalize=:pdf,
+        label="",
+        yaxis=:log,
+        xlabel="E (eV)",
+        ylabel="f(E)",
+        yticks=10. .^ (-5:-1))
 ```
