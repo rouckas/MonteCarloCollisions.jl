@@ -66,6 +66,9 @@ using Test
     @test length(helium_interaction_list) == 3
     @test length(helium_interaction_list[1].sigmav) == 8
 
+    e_He_excitation = load_interaction_lxcat("../data/CS_e_He.txt", "E + He -> E + He*(19.8eV), Excitation", electrons, helium)
+    @test e_He_excitation.DE ≈ 19.8
+
     # test svmax find and rate calculation
     electron_interactions = make_interactions(electrons, vcat(helium_interaction_list, argon_interaction_list), 20.)
     argonplus_interactions = make_interactions(argonplus, vcat(argonplus_argon_interaction_list), 1.0)

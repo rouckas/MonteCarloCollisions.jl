@@ -64,60 +64,65 @@ end
     sv
 end
 
-function load_interaction_lxcat(filename, process, species)
+function load_interaction_lxcat(filename, process, species1, species2)
     # load cross section from text file from lxcat database
+    # and return Interaction
+    DE, CS = load_cross_section_lxcat(filename, process)
+    Interaction(process, CS[:,2], CS[:,1], DE, species1, species2)
+end
+
+function load_cross_section_lxcat(filename, process)
+    # load cross section from text file from lxcat database
+    # and return DE and tabulated cross section
     nl = "\r\n"
     open(filename) do f
-        readuntil(f, process*nl*species*nl)
-        DE = parse(Float64, readline(f))
-
-        readuntil(f, "-----"*nl)
-        data_string = readuntil(f, "-----"*nl)
-        data_numbers = map(split(data_string, nl)[1:end-1]) do line
-            map(x->parse(Float64, x), split(line, "\t"))
-        end
-        DE, hcat(data_numbers...)'
+        readuntil(f, "PROCESS: "*process*nl)
+        parse_cross_section_lxcat(f, process)
     end
 end
 
-function load_interactions_lxcat(filename, species1, species2)
+function parse_cross_section_lxcat(stream, process)
     elastic_collision_types = ["Elastic", "Effective", "Backscat", "Isotropic"]
     inelastic_collision_types = ["Excitation", "Ionization", "Attachment"]
-    collision_types = [elastic_collision_types; inelastic_collision_types]
-
-    result = Interaction[]
-    # load cross section from text file from lxcat database
     nl = "\r\n"
+
+    collision_type = split(process, ", ")[end]
+    collision_target = split(process, ", ")[begin]
+
+    header = split(readuntil(stream, "-----"*nl), nl)
+
+    if collision_type in inelastic_collision_types
+        DE = NaN64
+        for hl in header
+            Estr = match(r"E = ([^ ]* )", hl)
+            if Estr !== nothing
+                DE = parse(Float64, Estr[1])
+            end
+        end
+        if isnan(DE)
+            error("DE of interaction "*collision_type*" "*collision_target*" not parsed")
+        end
+    else
+        DE = 0.
+    end
+
+    data_string = readuntil(stream, "-----"*nl)
+    data_numbers = map(split(data_string, nl)[1:end-1]) do line
+        map(x->parse(Float64, x), split(line, "\t"))
+    end
+    CS = hcat(data_numbers...)'
+    DE, CS
+end
+
+function load_interactions_lxcat(filename, species1, species2)
+    result = Interaction[]
+    # load all interactions from text file from lxcat database
     open(filename) do f
         for l in eachline(f)
             if startswith(l, "PROCESS: ")
-                l = split(l, "PROCESS: ")[end]
-                collision_type = split(l, ", ")[end]
-                collision_target = split(l, ", ")[begin]
-
-                header = split(readuntil(f, "-----"*nl), nl)
-
-                if collision_type in inelastic_collision_types
-                    DE = NaN64
-                    for hl in header
-                        Estr = match(r"E = ([^ ]* )", hl)
-                        if Estr !== nothing
-                            DE = parse(Float64, Estr[1])
-                        end
-                    end
-                    if isnan(DE)
-                        error("DE of interaction "*collision_type*" "*collision_target*" not parsed")
-                    end
-                else
-                    DE = 0.
-                end
-
-                data_string = readuntil(f, "-----"*nl)
-                data_numbers = map(split(data_string, nl)[1:end-1]) do line
-                    map(x->parse(Float64, x), split(line, "\t"))
-                end
-                CS = hcat(data_numbers...)'
-                push!(result, Interaction(collision_type*" "*collision_target,
+                process = split(l, "PROCESS: ")[end]
+                DE, CS = parse_cross_section_lxcat(f, process)
+                push!(result, Interaction(process,
                         CS[:,2], CS[:,1], DE, species1, species2
                     ))
             end
