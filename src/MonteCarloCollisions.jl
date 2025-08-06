@@ -64,16 +64,16 @@ end
     sv
 end
 
+"""load cross section from text file from lxcat database
+and return Interaction"""
 function load_interaction_lxcat(filename, process, species1, species2)
-    # load cross section from text file from lxcat database
-    # and return Interaction
     DE, CS = load_cross_section_lxcat(filename, process)
     Interaction(process, CS[:,2], CS[:,1], DE, species1, species2)
 end
 
+"""load cross section from text file from lxcat database
+and return DE and tabulated cross section"""
 function load_cross_section_lxcat(filename, process)
-    # load cross section from text file from lxcat database
-    # and return DE and tabulated cross section
     nl = "\r\n"
     open(filename) do f
         readuntil(f, "PROCESS: "*process*nl)
