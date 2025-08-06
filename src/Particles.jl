@@ -2,15 +2,46 @@ using StaticArrays
 abstract type AbstractParticle end
 abstract type AbstractEnsemble end
 
-
 mutable struct Particle3d3v <: AbstractParticle
     r::SVector{3, Float64}
     v::SVector{3, Float64}
     t::Float64
     tau::Float64
 end
+
 Base.zero(::Union{Type{Particle3d3v}, Particle3d3v}) = Particle3d3v(zero(SVector{3, Float64}), zero(SVector{3, Float64}), 0., 0.)
 
+
+mutable struct Particle1d3v <: AbstractParticle
+    r::SVector{1, Float64}
+    v::SVector{3, Float64}
+    t::Float64
+    tau::Float64
+end
+
+Base.zero(::Union{Type{Particle1d3v}, Particle1d3v}) = Particle1d3v(zero(SVector{1, Float64}), zero(SVector{3, Float64}), 0., 0.)
+
+
+mutable struct Particle1d3vE <: AbstractParticle
+    r::SVector{1, Float64}
+    v::SVector{3, Float64}
+    E::SVector{3, Float64}
+    t::Float64
+    tau::Float64
+end
+
+Base.zero(::Union{Type{Particle1d3vE}, Particle1d3vE}) = Particle1d3vE(zero(SVector{1, Float64}), zero(SVector{3, Float64}), zero(SVector{3, Float64}), 0., 0.)
+
+
+mutable struct Particle1d1vE <: AbstractParticle
+    r::SVector{1, Float64}
+    v::SVector{1, Float64}
+    E::SVector{1, Float64}
+    t::Float64
+    tau::Float64
+end
+
+Base.zero(::Union{Type{Particle1d1vE}, Particle1d1vE}) = Particle1d1vE(zero(SVector{1, Float64}), zero(SVector{1, Float64}), zero(SVector{1, Float64}), 0., 0.)
 
 mutable struct Particle0d3v <: AbstractParticle
     v::SVector{3, Float64}

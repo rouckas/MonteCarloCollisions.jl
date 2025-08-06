@@ -10,7 +10,8 @@ using LinearAlgebra: norm, dot, cross
 
 
 
-export NeutralEnsemble, ParticleEnsemble, Interaction, Interactions, add_interaction!
+export AbstractParticle, NeutralEnsemble, ParticleEnsemble, Interaction, Interactions, add_interaction!
+export Particle1d3v, Particle1d3vE, Particle1d1vE
 export load_interaction_lxcat, load_interactions_lxcat, svmax_find!, init_rates!, make_interactions
 export init_time, init_monoenergetic, init_thermal
 export advance, advance!, energy
